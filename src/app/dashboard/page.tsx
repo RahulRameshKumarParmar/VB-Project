@@ -4,7 +4,7 @@ import { useAuthStore } from "@/store/useAuthStore";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
-export default function page() {
+export default function Dashboard() {
   const { isAuthenticated } = useAuthStore();
   const router = useRouter();
 
