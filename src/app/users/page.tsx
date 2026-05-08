@@ -1,9 +1,10 @@
 "use client";
 
-import { useUserStore } from "@/store/useUserStore";
+import { User, useUserStore } from "@/store/useUserStore";
 import {
   Card,
   CardContent,
+  InputAdornment,
   Pagination,
   Paper,
   Stack,
@@ -13,24 +14,54 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TextField,
   Typography,
 } from "@mui/material";
-import { useEffect } from "react";
-
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { FaSearch } from "react-icons/fa";
 
 export default function Users() {
   const allUsers = useUserStore((state) => state.allUser);
   const getUsers = useUserStore((state) => state.getUsers);
   const page = useUserStore((state) => state.page);
   const setPage = useUserStore((state) => state.setPage);
-  
+  const [search, setSearch] = useState("");
+  const [searchResult, setSearchResult] = useState<User[]>([]);
+
   useEffect(() => {
     getUsers();
   }, [page]);
-  
+
   const handlePagination = (e: React.ChangeEvent<unknown>, value: number) => {
-    setPage(value)
-  }
+    setPage(value);
+  };
+
+  useEffect(() => {
+    const getSearch = async () => {
+      // when search is empty, clear searchResult and use paginated allUsers.
+      if (!search.trim()) {
+        setSearchResult([]);
+        return;
+      }
+
+      try {
+        const data = await axios.get(
+          `https://dummyjson.com/users/search?q=${search}`,
+        );
+        setSearchResult(data.data.users);
+      } catch (error) {
+        console.error("Login error:", error);
+        return false;
+      }
+    };
+    getSearch();
+  }, [search]);
+
+  // Change: single source used by table; no duplicate row JSX.
+  // If user typed something, always show search results (including empty array).
+  const rows = search.trim() ? searchResult : allUsers;
+
   return (
     <div>
       <Card
@@ -40,8 +71,34 @@ export default function Users() {
         }}
       >
         <CardContent>
-          <Typography sx={{ textAlign: "center" }} variant="h4" gutterBottom>
-            Users
+          <Typography
+            sx={{
+              marginBottom: 4,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+            variant="h5"
+            gutterBottom
+          >
+            <div>Users</div>
+            <div>
+              <TextField
+                variant="outlined"
+                placeholder="Search any user"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                slotProps={{
+                  input: {
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <FaSearch />
+                      </InputAdornment>
+                    ),
+                  },
+                }}
+              />
+            </div>
           </Typography>
 
           <TableContainer component={Paper}>
@@ -57,7 +114,7 @@ export default function Users() {
               </TableHead>
 
               <TableBody>
-                {allUsers.map((user) => (
+                {rows.map((user) => (
                   <TableRow key={user.id}>
                     <TableCell
                       sx={{ display: "flex", alignItems: "center", gap: 2 }}
@@ -71,11 +128,31 @@ export default function Users() {
                     <TableCell>{user.email}</TableCell>
                     <TableCell>{user.phone}</TableCell>
                     <TableCell>
-                      <span style={{border: user.gender === 'male' ? '1px solid blue' : '1px solid purple', color: user.gender === 'male' ? 'blue' : 'purple', padding: '6px 10px 6px 10px', borderRadius: 15}}>{user.gender}</span>
+                      <span
+                        style={{
+                          border:
+                            user.gender === "male"
+                              ? "1px solid blue"
+                              : "1px solid purple",
+                          color: user.gender === "male" ? "blue" : "purple",
+                          padding: "6px 10px 6px 10px",
+                          borderRadius: 15,
+                        }}
+                      >
+                        {user.gender}
+                      </span>
                     </TableCell>
                     <TableCell>{user.company.name}</TableCell>
                   </TableRow>
                 ))}
+                {/* Change: explicit empty state for "typed search but no match". */}
+                {rows.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={5} align="center">
+                      No users found
+                    </TableCell>
+                  </TableRow>
+                )}
               </TableBody>
             </Table>
           </TableContainer>
@@ -86,7 +163,8 @@ export default function Users() {
               onChange={handlePagination}
               count={20}
               color="primary"
-              shape="rounded" />
+              shape="rounded"
+            />
           </Stack>
         </CardContent>
       </Card>

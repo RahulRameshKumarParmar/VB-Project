@@ -1,7 +1,7 @@
 import axios from "axios";
 import { create } from "zustand";
 
-interface User {
+export interface User {
   id: number;
   image: string;
   firstName: string;
@@ -48,8 +48,9 @@ export const useUserStore = create<UserState>((set, get) => ({
   getUsers: async () => {
     let currentPage = get().page;
     try {
+      // Change: page 1 should start at skip=0, so use (page - 1) * limit.
       const data = await axios.get(
-        `https://dummyjson.com/users?limit=10&skip=${currentPage * 10}`,
+        `https://dummyjson.com/users?limit=10&skip=${(currentPage - 1) * 10}`,
       );
       set({
         allUser: data.data.users,
