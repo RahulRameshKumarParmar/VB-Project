@@ -145,7 +145,7 @@ export default function Users() {
                     <TableCell>{user.company.name}</TableCell>
                   </TableRow>
                 ))}
-                {/* Change: explicit empty state for "typed search but no match". */}
+                {/* explicit empty state for "typed search but no match". */}
                 {rows.length === 0 && (
                   <TableRow>
                     <TableCell colSpan={5} align="center">
