@@ -21,7 +21,7 @@ export default function LoginPage() {
   const login = useAuthStore((state: any) => state.login);
   const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent<HTMLInputElement>) => {
+  const handleSubmit = async (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
     setError("");
 

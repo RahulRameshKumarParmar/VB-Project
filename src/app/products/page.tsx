@@ -7,32 +7,45 @@ import {
   CardActions,
   CardContent,
   CardMedia,
+  FormControl,
   InputAdornment,
+  InputLabel,
+  MenuItem,
   Pagination,
+  Select,
   Stack,
   TextField,
   Typography,
 } from "@mui/material";
 import axios from "axios";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FaSearch } from "react-icons/fa";
 
 export default function Products() {
   const allProducts = useProductStore((state) => state.allProducts);
-  const getUsers = useProductStore((state) => state.getProducts);
+  const getProducts = useProductStore((state) => state.getProducts);//Function
+  const allCategories = useProductStore((state) => state.allCategories);
+  const getCategoryList = useProductStore((state) => state.getCategoryList);//Function
+  const getByCategory = useProductStore((state) => state.getByCategory);//Function
   const page = useProductStore((state) => state.page);
   const setPage = useProductStore((state) => state.setPage);
   const [search, setSearch] = useState("");
   const [searchResult, setSearchResult] = useState<Product[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const router = useRouter();
+  // console.log(allCategories);
 
+  // Getting All Products List
   useEffect(() => {
-    getUsers();
+    getProducts();
   }, [page]);
 
   const handlePagination = (e: React.ChangeEvent<unknown>, value: number) => {
     setPage(value);
   };
 
+  // Search Filter
   useEffect(() => {
     const getSearch = async () => {
       // when search is empty, clear searchResult and use paginated allUsers.
@@ -54,7 +67,23 @@ export default function Products() {
     getSearch();
   }, [search]);
 
+  // Getting list of all Category
+  useEffect(() => {
+    getCategoryList();
+  }, []);
+
+  // Getting list of selected category
+  useEffect(() => {
+    if (selectedCategory !== "") {
+      getByCategory(selectedCategory);
+    }
+  }, [selectedCategory]);
+
   const rows = search.trim() ? searchResult : allProducts;
+
+  const handleClick = () => {
+    router.push('/product-detail');
+  }
 
   return (
     <div className="p-5 mx-5">
@@ -69,8 +98,22 @@ export default function Products() {
         gutterBottom
       >
         <div>Products</div>
+        <FormControl size="small" sx={{ width: 200 }}>
+          <InputLabel>Category</InputLabel>
+
+          <Select
+            label="Category"
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+          >
+            {allCategories.map((list) => (
+              <MenuItem value={list}>{list}</MenuItem>
+            ))}
+          </Select>
+        </FormControl>
         <div>
           <TextField
+            size="small"
             variant="outlined"
             placeholder="Search any user"
             value={search}
@@ -90,6 +133,7 @@ export default function Products() {
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4  gap-5 m-5">
         {rows.map((product) => (
           <Card
+            onClick={handleClick}
             key={product.id}
             sx={{
               width: "22vw",
