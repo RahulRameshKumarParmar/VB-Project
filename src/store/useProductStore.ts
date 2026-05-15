@@ -35,6 +35,8 @@ interface ProductState {
   getCategoryList: () => void;
   getByCategory: (categoryName: string) => void;
   allCategories: string[];
+  getSingleProduct: (selectedID: number) => void;
+  singleProductDetail: Product | null;
 }
 
 export const useProductStore = create<ProductState>((set, get) => ({
@@ -42,6 +44,7 @@ export const useProductStore = create<ProductState>((set, get) => ({
   page: 1,
   setPage: (page) => set({ page }),
   allCategories: [],
+  singleProductDetail: null,
 
   getProducts: async () => {
     let currentPage = get().page;
@@ -65,8 +68,8 @@ export const useProductStore = create<ProductState>((set, get) => ({
         `https://dummyjson.com/products/category-list`,
       );
       set({
-        allCategories: data.data
-      })
+        allCategories: data.data,
+      });
     } catch (error) {
       console.error("Login error:", error);
     }
@@ -79,6 +82,17 @@ export const useProductStore = create<ProductState>((set, get) => ({
       );
       set({
         allProducts: data.data.products,
+      });
+    } catch (error) {
+      console.error("Login error:", error);
+    }
+  },
+
+  getSingleProduct: async (selectedID) => {
+    try {
+      const data = await axios.get(`https://dummyjson.com/products/${selectedID}`);
+      set({
+        singleProductDetail: data.data.products,
       });
     } catch (error) {
       console.error("Login error:", error);
