@@ -55,9 +55,9 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   getAuthUser: async () => {
     try {
-      const token = localStorage.getItem("token") || "";
+      const token = localStorage.getItem("token") || null;
       let response;
-      if (token) {
+      if (token !== null){
         response = await axios.get("https://dummyjson.com/auth/me", {
           headers: {
             Authorization: `Bearer ${token}`, // Pass JWT via Authorization header
@@ -71,7 +71,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       }
     } catch (error) {
       console.error("Error while Getting Auth User:", error);
-    }
+    } 
   },
 
   logout: () => {
