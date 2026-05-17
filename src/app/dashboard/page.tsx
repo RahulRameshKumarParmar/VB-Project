@@ -2,13 +2,14 @@
 
 import { useAuthStore } from "@/store/useAuthStore";
 import { useProductStore } from "@/store/useProductStore";
-import { useUserStore } from "@/store/useUserStore";
+import { User, useUserStore } from "@/store/useUserStore";
 import { Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { FaShoppingBag, FaStar } from "react-icons/fa";
 import { HiHandRaised } from "react-icons/hi2";
 import { MdGroup } from "react-icons/md";
+import { ClipLoader } from "react-spinners";
 
 export default function Dashboard() {
   const { isAuthenticated } = useAuthStore();
@@ -24,6 +25,7 @@ export default function Dashboard() {
   const getProducts = useProductStore((state) => state.getProducts);
   const allProducts = useProductStore((state) => state.allProducts);
   const limitedProducts = allProducts?.slice(0, 5);
+  const isLoading = useAuthStore((state) => state.isLoading);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -40,6 +42,13 @@ export default function Dashboard() {
     getProducts();
   }, []);
 
+  if(isLoading){
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <ClipLoader size={50}/>
+      </div>
+    )
+  }
   return (
     <div className="bg-gray-100 p-5">
       <Typography sx={{ fontSize: 32, fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 2 }} variant="h1">
@@ -112,7 +121,7 @@ export default function Dashboard() {
           <div className="flex items-center justify-between px-5 mb-5 pb-5">
             <h3 className="font-bold">Recent Products</h3>
             <button
-            onClick={() => router.push('/products')}
+              onClick={() => router.push('/products')}
               className="text-blue-600 font-bold cursor-pointer">
               View all
             </button>
@@ -131,7 +140,7 @@ export default function Dashboard() {
                   <span>{product?.title}</span>
                   <div className="flex items-center gap-2">
                     <span>${product?.price.toFixed(2)}</span>
-                    <span className="flex items-center gap-1"> <FaStar className="text-yellow-400"/> {product?.rating}</span>
+                    <span className="flex items-center gap-1"> <FaStar className="text-yellow-400" /> {product?.rating}</span>
                   </div>
                 </div>
               </div>

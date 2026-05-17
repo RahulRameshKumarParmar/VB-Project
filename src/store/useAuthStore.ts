@@ -11,6 +11,7 @@ interface AuthState {
   getAuthUser: () => void;
   currentUser: User | null;
   updateIsAuthenticate: () => void;
+  isLoading: boolean;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -18,6 +19,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   token: null,
   isAuthenticated: false,
   currentUser: null,
+  isLoading: false,
 
   login: async (username, password) => {
     try {
@@ -55,6 +57,7 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   getAuthUser: async () => {
     try {
+      set({ isLoading: true });
       const token = localStorage.getItem("token") || null;
       let response;
       if (token !== null){
@@ -67,6 +70,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       if (response) {
         set({
           currentUser: response.data,
+          isLoading: false,
         });
       }
     } catch (error) {
