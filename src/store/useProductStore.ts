@@ -35,7 +35,7 @@ interface ProductState {
   getCategoryList: () => void;
   getByCategory: (categoryName: string) => void;
   allCategories: string[];
-  getSingleProduct: (selectedID: number) => void;
+  getSingleProduct: (selectedID: number | null) => void;
   singleProductDetail: Product | null;
 }
 
@@ -88,11 +88,14 @@ export const useProductStore = create<ProductState>((set, get) => ({
     }
   },
 
-  getSingleProduct: async (selectedID) => {
+  getSingleProduct: async (id: number | null) => {
+    if (id === null) return;
+    localStorage.setItem("clickedID", JSON.stringify(id));
+
     try {
-      const data = await axios.get(`https://dummyjson.com/products/${selectedID}`);
+      const data = await axios.get(`https://dummyjson.com/products/${id}`);
       set({
-        singleProductDetail: data.data.products,
+        singleProductDetail: data.data,
       });
     } catch (error) {
       console.error("Login error:", error);

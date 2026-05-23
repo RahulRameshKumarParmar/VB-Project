@@ -119,7 +119,7 @@ export default function Users() {
                     <TableCell
                       sx={{ display: "flex", alignItems: "center", gap: 2 }}
                     >
-                      <img height={50} src={user.image} alt="user image" />
+                      <img className="w-[5vw]" src={user.image} alt="user image" />
                       <div>
                         <div>{user.firstName}</div>
                         <div>{user.lastName}</div>

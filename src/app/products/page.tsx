@@ -28,6 +28,7 @@ export default function Products() {
   const allCategories = useProductStore((state) => state.allCategories);
   const getCategoryList = useProductStore((state) => state.getCategoryList);//Function
   const getByCategory = useProductStore((state) => state.getByCategory);//Function
+  const getSingleProduct = useProductStore((state) => state.getSingleProduct);//Function
   const page = useProductStore((state) => state.page);
   const setPage = useProductStore((state) => state.setPage);
   const [search, setSearch] = useState("");
@@ -81,7 +82,8 @@ export default function Products() {
 
   const rows = search.trim() ? searchResult : allProducts;
 
-  const handleClick = () => {
+  const handleClick = (id: number) => {
+    getSingleProduct(id);
     router.push('/product-detail');
   }
 
@@ -133,7 +135,7 @@ export default function Products() {
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4  gap-5 m-5">
         {rows.map((product) => (
           <Card
-            onClick={handleClick}
+            onClick={() => handleClick(product.id)}
             key={product.id}
             sx={{
               width: "22vw",
